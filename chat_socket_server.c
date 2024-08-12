@@ -1,5 +1,6 @@
 /**
  * Define headers
+ * This code refers to this web-site "https://velog.io/@dev-hoon/%EB%A9%80%ED%8B%B0-%EC%93%B0%EB%A0%88%EB%93%9C-%EA%B8%B0%EB%B0%98-%EB%8B%A4%EC%A4%91-%EC%B1%84%ED%8C%85"
  */
 
 #include <stdio.h>
@@ -13,6 +14,7 @@
 
 /**
  * Define static sizes
+ * We'll service to 256 clients
  */
 
 #define BUF_SIZE 100
@@ -26,8 +28,13 @@ void *handle_clnt(void *arg);
 void send_msg(char *msg, int len);
 void error_handling(char *msg);
 
-int clnt_cnt = 0;
+/**
+ * A data area.
+ * Here will be shared with other threads.
+ * There are multi clients connect to the server, client socket should be a list.
+ */
 
+int clnt_cnt = 0;
 int clnt_socks[MAX_CLNT];
 pthread_mutex_t mutx;
 
@@ -40,26 +47,32 @@ int main(int argc, char *argv[]){
     int option;
     socklen_t optlen;
 
-    if(argc != 2){
+    if(argc != 2){ // <File Name> <Port #>
         printf("Usage: %s <port>\n", argv[0]);
         exit(1);
     }
 
+    // Generate Mutex
     pthread_mutex_init(&mutx, NULL);
     serv_sock = socket(PF_INET, SOCK_STREAM, 0);
 
+    // Eliminate Time-wait
+    // SO_REUSEADDR 0 -> 1
     optlen = sizeof(option);
     option = 1;
     setsockopt(serv_sock, SOL_SOCKET, SO_REUSEADDR, (void *)&option, optlen);
 
+    // Allocate IPv4, IP, Port
     memset(&serv_adr, 0, sizeof(serv_adr));
     serv_adr.sin_family = AF_INET;
     serv_adr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_adr.sin_port = htons(atoi(argv[1]));
 
+    // Allocate an address
     if (bind(serv_sock, (struct sockaddr *)&serv_adr, sizeof(serv_adr)) == -1)
         error_handling("bind() error");
     
+
     if (listen(serv_sock, 5) == -1 ){
         error_handling("listening() error");
     }
@@ -79,7 +92,8 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void *handle_clnt(void *arg){
+void *handle_clnt(void *arg) {
+    // void -> int
     int clnt_sock = *((int *)arg);
     int str_len = 0;
     char msg[BUF_SIZE];
@@ -104,10 +118,14 @@ void *handle_clnt(void *arg){
 }
 
 void send_msg(char *msg, int len){
+    // lock mutex: clnt_cnt, clnt_socks[]
     pthread_mutex_lock(*mutx);
     for(int i = 0; i < clnt_cnt; i++){
+        // send to every socket clients
         while(clnt_socks[i], msg, len);
     }
+
+    // unlock mutex
     pthread_mutex_unlock(&mutx);
 }
 
