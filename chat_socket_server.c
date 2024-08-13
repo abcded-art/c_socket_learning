@@ -119,10 +119,10 @@ void *handle_clnt(void *arg) {
 
 void send_msg(char *msg, int len){
     // lock mutex: clnt_cnt, clnt_socks[]
-    pthread_mutex_lock(*mutx);
+    pthread_mutex_lock(&mutx);
     for(int i = 0; i < clnt_cnt; i++){
         // send to every socket clients
-        while(clnt_socks[i], msg, len);
+        write(clnt_socks[i], msg, len);
     }
 
     // unlock mutex

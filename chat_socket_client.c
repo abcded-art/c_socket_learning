@@ -37,8 +37,8 @@ int main(int argc, char *argv[]){
 
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inte_addr(argv[1]);
-    serv_addr.sin_port = htos(atoi(argv[2]));
+    serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
+    serv_addr.sin_port = htons(atoi(argv[2]));
 
     if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
         error_handling("connect() error");
@@ -60,6 +60,7 @@ int main(int argc, char *argv[]){
 void *send_msg(void *arg){
     int sock = *((int *)arg);
     char name_msg[NAME_SIZE + BUF_SIZE];
+    printf("You: ");
     while(1){
         fgets(msg, BUF_SIZE, stdin);
         if(!strcmp(msg, "q\n") || !strcmp(msg, "Q\n")){
@@ -80,11 +81,12 @@ void *recv_msg(void *arg){
     int str_len;
     while(1){
         str_len = read(sock, name_msg, NAME_SIZE + BUF_SIZE - 1);
+        printf("\n");
         if(str_len == -1){
             return (void *) -1;
         }
         name_msg[str_len] = 0;
-        fputs(name_msg, stdou);
+        fputs(name_msg, stdout);
     }
     return NULL;
 }
