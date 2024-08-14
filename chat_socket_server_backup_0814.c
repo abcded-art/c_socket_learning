@@ -30,15 +30,11 @@
 void *handle_clnt(void *arg);
 void send_msg(char *msg, int len);
 void error_handling(char *msg);
-void *admin_thread(void *arg);
-
-int show_menu();
+void show_menu();
 void show_connecting_hosts();
 void show_recent_messages();
-void announce_clients();
-void schedule_notifications();
-
 int getIntValue();
+int shopOptions();
 
 /**
  * A data area.
@@ -54,7 +50,7 @@ int main(int argc, char *argv[]){
     int serv_sock, clnt_sock;
     struct sockaddr_in serv_adr, clnt_adr;
     int clnt_adr_sz;
-    pthread_t t_id, admin_t_id;
+    pthread_t t_id;
 
     int option;
     socklen_t optlen;
@@ -92,30 +88,7 @@ int main(int argc, char *argv[]){
         error_handling("listening() error");
     }
 
-    // Admin thread
-    pthread_create(&admin_t_id, NULL, admin_thread, NULL);
-    pthread_detach(admin_t_id);
-
     while(1){
-        int userInput = show_menu();
-        switch(userInput){
-            case 1:
-                show_connecting_hosts();
-                break;
-            case 2:
-                printf("Case 2\n");
-                break;
-            case 3:
-                printf("Case 3\n");
-                break;
-            case 4:
-                printf("Case 4\n");
-                break;
-            default:
-                printf("Server shutting down...\n");
-                return 0;
-        }
-        printf("It comes here\n");
         clnt_adr_sz = sizeof(clnt_adr);
         clnt_sock = accept(serv_sock, (struct sockaddr *)&clnt_adr, &clnt_adr_sz);
         pthread_mutex_lock(&mutx);
@@ -156,13 +129,6 @@ void *handle_clnt(void *arg) {
     return NULL;
 }
 
-void *admin_thread(void *arg){
-    char input;
-    while(1){
-        printf("Press 's' to show server status or 'q' to quit: \n")
-    }
-}
-
 void send_msg(char *msg, int len){
     // lock mutex: clnt_cnt, clnt_socks[]
     pthread_mutex_lock(&mutx);
@@ -175,14 +141,14 @@ void send_msg(char *msg, int len){
     pthread_mutex_unlock(&mutx);
 }
 
-void error_handling(char *msg){ 
+void error_handling(char *msg){
     fputs(msg, stderr);
     fputc('\n', stderr);
     exit(1);
 }
 
 int getIntValue(){
-    int res = 0;
+        int res = 0;
     while(1){
         if(scanf("%d",&res) != 1){
             printf("Invalid input. Please enter an integer value.\n");
@@ -194,7 +160,7 @@ int getIntValue(){
     return res;
 }
 
-int show_menu(){
+void show_menu(){
     int userInput = 0;
     while(1){
         printf("========== Server Options ==========\n");
@@ -222,7 +188,7 @@ void show_connecting_hosts(){
         struct sockaddr_in clnt_adr;
         socklen_t clnt_adr_sz = sizeof(clnt_adr);
         getpeername(clnt_socks[i], (struct sockaddr *)&clnt_adr, &clnt_adr_sz);
-        printf("%s %s\n", inet_ntoa(clnt_adr.sin_addr), "aa");
+        
     }
 }
 
