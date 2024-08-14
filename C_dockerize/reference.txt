@@ -1,0 +1,2 @@
+https://medium.com/@sijomthomas05/dockerize-a-hello-world-application-in-c-language-e8ab360c94cf
+https://packages.debian.org/sid/musl-dev
