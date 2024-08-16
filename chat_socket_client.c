@@ -13,7 +13,7 @@ void *send_msg(void *arg);
 void *recv_msg(void *arg);
 void error_handling(char *msg);
 
-char name[NAME_SIZE] = "[DEFAULT]";
+char name[NAME_SIZE] = "DEFAULT";
 char msg[BUF_SIZE];
 
 int main(int argc, char *argv[]){
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-    sprintf(name, "[%s]", argv[3]);
+    sprintf(name, "%s", argv[3]);
 
     sock = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -42,6 +42,8 @@ int main(int argc, char *argv[]){
 
     if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
         error_handling("connect() error");
+
+    write(sock, argv[3], strlen(argv[3]));
     
     // Generate two threads. Each main are send_msg, recv_msg
     pthread_create(&snd_thread, NULL, send_msg, (void *)&sock);
@@ -60,14 +62,15 @@ int main(int argc, char *argv[]){
 void *send_msg(void *arg){
     int sock = *((int *)arg);
     char name_msg[NAME_SIZE + BUF_SIZE];
-    printf("You: ");
+    printf("You[%s]: ", name);
     while(1){
         fgets(msg, BUF_SIZE, stdin);
         if(!strcmp(msg, "q\n") || !strcmp(msg, "Q\n")){
             close(sock);
             exit(0);
         }
-        sprintf(name_msg, "%s %s", name, msg);
+        // Expand 20 for additional annotations
+        snprintf(name_msg, sizeof(name_msg) + 4, "[%s]: %s", name, msg);
         write(sock, name_msg, strlen(name_msg));
     }
     return NULL;
@@ -81,12 +84,22 @@ void *recv_msg(void *arg){
     int str_len;
     while(1){
         str_len = read(sock, name_msg, NAME_SIZE + BUF_SIZE - 1);
-        printf("\n");
         if(str_len == -1){
             return (void *) -1;
         }
-        name_msg[str_len] = 0;
-        fputs(name_msg, stdout);
+        name_msg[str_len] = '\0';
+
+        // 커서를 한 줄 위로 이동하고, 그 줄을 지움
+        // printf("\033[A");  // 현재 라인을 지움
+        printf("\033[A\033[K");
+        printf("%s", name_msg);
+
+        if(name_msg[str_len - 1] != '\n'){
+            printf("\n");
+        }
+        
+        printf("You[%s]: ", name);  
+        fflush(stdout);  
     }
     return NULL;
 }
