@@ -1,0 +1,11 @@
+[2024-08-19 17:12:47] Server Starts Running by host [ LAPTOP-M7MABSSB ]
+[2024-08-19 17:12:50] Server Starts Running by host [ LAPTOP-M7MABSSB ]
+[2024-08-19 17:12:58] New client [ Ethan ] connected
+[2024-08-19 17:12:59] New client [ Winter ] connected
+[2024-08-19 17:13:02] [Winter]: HI
+[2024-08-19 17:13:05] [Ethan]: Hello
+[2024-08-19 17:13:11] [Winter]: How are you?
+[2024-08-19 17:13:16] [Ethan]: I'm doing well, you?
+[2024-08-19 17:13:21] [Winter]: I'm good!
+[2024-08-19 17:15:36] Client [ Ethan ] leaved
+[2024-08-19 17:15:37] Client [ Winter ] leaved

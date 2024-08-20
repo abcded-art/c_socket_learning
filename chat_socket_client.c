@@ -11,6 +11,7 @@
 
 void *send_msg(void *arg);
 void *recv_msg(void *arg);
+void *brd_msg(void *arg);
 void error_handling(char *msg);
 
 char name[NAME_SIZE] = "DEFAULT";
@@ -40,9 +41,11 @@ int main(int argc, char *argv[]){
     serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
     serv_addr.sin_port = htons(atoi(argv[2]));
 
+    // 처음 접속 시 소켓 정보 연결
     if(connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
         error_handling("connect() error");
 
+    // TCP 소켓 연결 ACK신호를 모두 받으면, 처음 메세지로 유저 닉네임 전송
     write(sock, argv[3], strlen(argv[3]));
     
     // Generate two threads. Each main are send_msg, recv_msg
@@ -85,13 +88,17 @@ void *recv_msg(void *arg){
     while(1){
         str_len = read(sock, name_msg, NAME_SIZE + BUF_SIZE - 1);
         if(str_len == -1){
+            printf("Error: Failed to read message from server.\n");
             return (void *) -1;
+        } else if(str_len == 0){
+            printf("Connection closed by server.\n");
+            break;
         }
         name_msg[str_len] = '\0';
 
         // 커서를 한 줄 위로 이동하고, 그 줄을 지움
         // printf("\033[A");  // 현재 라인을 지움
-        printf("\033[A\033[K");
+        // printf("\033[A\033[K");
         printf("%s", name_msg);
 
         if(name_msg[str_len - 1] != '\n'){
