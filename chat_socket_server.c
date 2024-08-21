@@ -345,7 +345,7 @@ void show_connecting_hosts() {
 
     // end of the temp
     if(clnt_cnt > 0){
-        printf("*** [ Host lists } *** \n");
+        printf("*** [ Host lists ] *** \n");
         for(int i = 0; i < clnt_cnt; i++){
             struct sockaddr_in clnt_adr;
             socklen_t clnt_adr_sz = sizeof(clnt_adr);
@@ -440,7 +440,7 @@ void announce_clients() {
             msg[len - 1] = '\0';
         }
         char full_msg[BUF_SIZE + 20];
-        snprintf(full_msg, sizeof(full_msg), "[manager]: %s", msg);
+        snprintf(full_msg, sizeof(full_msg), "[manager]: %s\n", msg);
         printf("Announcement: %s \n", msg);
         save_log(full_msg);
         for (int i = 0; i < clnt_cnt; i++){
@@ -486,7 +486,17 @@ void selectTimerOptions(){
 }
 
 void setTimerSchedule() {
-    printf("SetTimerSchedule()\n");
+    int m, s;
+    printf("We can schedule after dedicated minutes and seconds.\n");
+    printf("Type minutes: ");
+    scanf("%d", &m);
+    printf("Type seconds: ");
+    scanf("%d", &s);
+    if((m <= 0 && s <= 0) || m < 0 || s < 0){
+        printf("Time not scheduled\n");
+        return;
+    }
+    
 }
 
 void showTimerSchedules() {
