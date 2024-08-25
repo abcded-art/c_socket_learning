@@ -37,7 +37,7 @@ void *admin_thread(void *arg);
 int show_menu();
 void show_connecting_hosts();
 void show_recent_messages();
-void print_logs(char logs[][128], int start, int end);
+void print_logs(char logs[][BUF_SIZE], int start, int end);
 void announce_clients();
 void setTimerSchedule();
 void selectTimerOptions();
@@ -361,7 +361,9 @@ void show_connecting_hosts() {
  */
 
 void show_recent_messages() {
-    char logs[MAX_LOG_LINES][256];
+    // Max log line configured by 1000
+    // Message line configured at 100, which represents 'BUFF_SIZE'
+    char logs[MAX_LOG_LINES][BUF_SIZE];
     int logCount = 0;
     FILE *fp = fopen("chat_log.txt", "r");
     if (fp == NULL){
@@ -384,34 +386,31 @@ void show_recent_messages() {
         printf("[2] Show all messages\n");
         printf("[3] Exit showing messages\n");
         userInput = getIntValue();
+        
+        while(userInput > 2 || userInput < 0){
+            printf("Invalid number, try again: ");
+            userInput = getIntValue();
+        }
+
         switch(userInput){
         case 1:
-            start = (logCount > 50) ? logcount - 50 : 0;
+            start = (logCount > 50) ? logCount - 50 : 0;
             end = logCount;
             while(start > 0){
                 print_logs(logs, start, end);
-                
-                logCount -= 50;
-                if(logLength <= 0){
+                if(logCount <= 0){
                     printf("\nAll log printed\n");
                     break;
                 }
-                while(logLength > 2 || logLength < 0){
-                    printf("Invalid number, try again: ");
-                    userInput = getIntValue();
-                }
-                userInput = getIntValue();
-                if(userInput == 1){
-                    continue;
-                } else if(userInput == 2){
-                    break;
-                }
-
             }
             
             break;
         case 2:
             // Logics for show all log datas from chat_log.txt
+            start = 0;
+            end = logCount;
+            print_logs(logs, start, end);
+            printf("\nAll log printed\n");
             break;
         default:
             printf("Exit [2] Notification Options\n");
@@ -420,7 +419,7 @@ void show_recent_messages() {
     }
 }
 
-void print_logs(char logs[][128], int start, int end){
+void print_logs(char logs[][BUF_SIZE], int start, int end){
     for(int i = start; i < end; i++){
         printf("%s", logs[i]);
     }
