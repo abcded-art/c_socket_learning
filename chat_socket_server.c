@@ -387,7 +387,7 @@ void show_recent_messages() {
         printf("[3] Exit showing messages\n");
         userInput = getIntValue();
         
-        while(userInput > 2 || userInput < 0){
+        while(userInput > 3 || userInput < 0){
             printf("Invalid number, try again: ");
             userInput = getIntValue();
         }

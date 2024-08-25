@@ -1,0 +1,3 @@
+[2024-08-25 23:37:28] Server Starts Running by host [ Gyumins-MacBook-Air.local ]
+[2024-08-25 23:38:19] Server Starts Running by host [ Gyumins-MacBook-Air.local ]
+[2024-08-25 23:38:27] Server Shutted Down by host [ Gyumins-MacBook-Air.local ]
